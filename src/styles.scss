@@ -1,1 +1,61 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --frontend-primary: #4b5dfa;
+  --frontend-secondary: #9333ea;
+  --frontend-accent: #f43f5e;
+  --frontend-background: #f9fafb;
+  --frontend-foreground: #111827;
+  --frontend-muted: #e5e7eb;
+  --frontend-muted-foreground: #6b7280;
+  --frontend-border: #d1d5db;
+  --frontend-dark: #1f2937;
+}
+
+/* Custom Tailwind Components */
+@layer components {
+  .container-app {
+    @apply mx-auto px-4 sm:px-6 lg:px-16 max-w-full;
+  }
+
+  .btn-primary {
+    @apply bg-frontend-primary hover:bg-frontend-secondary px-4 py-2 rounded-lg text-white transition;
+  }
+
+  .btn-secondary {
+    @apply bg-frontend-muted hover:bg-frontend-accent px-4 py-2 rounded-lg text-frontend-foreground hover:text-white transition;
+  }
+
+  .nav-link {
+    @apply text-frontend-foreground hover:text-frontend-accent transition-colors duration-300;
+  }
+
+  .nav-link-active {
+    @apply font-medium text-frontend-accent;
+  }
+
+  .card {
+    @apply bg-frontend-muted shadow-sm p-6 border border-frontend-border rounded-xl;
+  }
+
+  .gradient-frontend {
+    background-image: linear-gradient(to top, #cc208e 0%, #6713d2 100%);
+  }
+
+  .text-gradient-frontend {
+    background-image: linear-gradient(to top, #cc208e 0%, #6713d2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Global Styles */
+body {
+  @apply bg-frontend-background min-h-screen font-sans text-frontend-foreground;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading text-frontend-foreground;
+}

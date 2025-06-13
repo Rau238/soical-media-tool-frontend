@@ -1,0 +1,58 @@
+<div class="bg-gray-100 p-6 min-h-screen">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="mb-2 font-bold text-gray-900 text-3xl">Connect Your Social Accounts</h1>
+      <p class="text-gray-600">Link your social media accounts to SocialSync to schedule posts, analyze engagement, and manage all your social presence from one dashboard.</p>
+    </div>
+    <button routerLink="/dashboard" class="flex items-center bg-white hover:bg-gray-50 shadow px-4 py-2 rounded-lg text-gray-700">
+      <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Dashboard
+    </button>
+  </div>
+
+  <h2 class="mb-4 font-semibold text-gray-800 text-2xl">Available Platforms</h2>
+
+  <div class="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- Facebook Card -->
+    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
+      <img src="png/facebook.png" alt="Facebook" class="mb-4 w-10 h-10">
+      <h3 class="mb-2 font-semibold text-gray-900 text-xl">Facebook</h3>
+      <p class="mb-6 text-gray-600 text-sm">Connect your Facebook profile or pages to schedule posts, analyze engagement, and manage comments.</p>
+      <button class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
+        Connect
+      </button>
+    </div>
+
+    <!-- Twitter Card -->
+    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
+      <img src="png/twitter.png" alt="Twitter" class="mb-4 w-10 h-10">
+      <h3 class="mb-2 font-semibold text-gray-900 text-xl">Twitter</h3>
+      <p class="mb-6 text-gray-600 text-sm">Link your Twitter account to schedule tweets, monitor mentions, and track engagement metrics.</p>
+      <button class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
+        Connect
+      </button>
+    </div>
+
+    <!-- Instagram Card -->
+    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
+      <img src="png/instagram.png" alt="Instagram" class="mb-4 w-10 h-10">
+      <h3 class="mb-2 font-semibold text-gray-900 text-xl">Instagram</h3>
+      <p class="mb-6 text-gray-600 text-sm">Connect Instagram to schedule posts, analyze follower growth, and manage comments.</p>
+      <button class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
+        Connect
+      </button>
+    </div>
+
+    <!-- LinkedIn Card -->
+    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
+      <img src="png/linkedin.png" alt="LinkedIn" class="mb-4 w-10 h-10">
+      <h3 class="mb-2 font-semibold text-gray-900 text-xl">LinkedIn</h3>
+      <p class="mb-6 text-gray-600 text-sm">Link your LinkedIn profile or company pages to schedule updates and track professional engagement.</p>
+      <button (click)="loginWithLinkedIn()" class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
+        Connect
+      </button>
+    </div>
+  </div>
+</div>
