@@ -1,0 +1,82 @@
+<div class="composer-container">
+  <div class="composer-card">
+    <div class="composer-header">
+      <h2>Create Post</h2>
+    </div>
+
+    <div class="composer-body">
+      <div class="row">
+        <div class="form-group">
+          <label>Facebook Account</label>
+          <select [disabled]="isLoadingAccounts" (change)="onSelectAccount($any($event.target).value)">
+            <option *ngFor="let acc of facebookAccounts" [value]="acc._id || acc.id" [selected]="(acc._id||acc.id)===selectedAccountId">
+              {{ acc.accountName }}
+            </option>
+          </select>
+          <small *ngIf="!facebookAccounts.length">No Facebook accounts connected</small>
+        </div>
+
+        <div class="form-group">
+          <label>Target</label>
+          <div class="segmented">
+            <button [class.active]="targetMode==='page'" (click)="onChangeTargetMode('page')">Facebook Page</button>
+            <button [class.active]="targetMode==='instagram'" (click)="onChangeTargetMode('instagram')">Instagram</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="targetMode==='page'">
+        <div class="form-group">
+          <label>Page</label>
+          <select [disabled]="isLoadingTargets" [(ngModel)]="selectedPageId">
+            <option *ngFor="let page of facebookPages" [value]="page.id">{{ page.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="targetMode==='instagram'">
+        <div class="form-group">
+          <label>Instagram Account</label>
+          <select [disabled]="isLoadingTargets" [(ngModel)]="selectedInstagramId">
+            <option *ngFor="let ig of instagramAccounts" [value]="ig.id">{{ ig.username }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Message</label>
+          <textarea rows="3" [(ngModel)]="message" placeholder="Write something..."></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Link (optional)</label>
+          <input type="url" [(ngModel)]="link" placeholder="https://example.com" />
+        </div>
+        <div class="form-group">
+          <label>Image URL {{ targetMode==='instagram' ? '(required)' : '(optional)' }}</label>
+          <input type="url" [(ngModel)]="imageUrl" placeholder="https://public-image.jpg" />
+        </div>
+      </div>
+
+      <div class="row" *ngIf="targetMode==='instagram'">
+        <div class="form-group">
+          <label>Caption (optional)</label>
+          <input type="text" [(ngModel)]="caption" placeholder="Instagram caption" />
+        </div>
+      </div>
+
+      <div class="preview" *ngIf="imageUrl">
+        <img [src]="imageUrl" alt="preview" />
+      </div>
+    </div>
+
+    <div class="composer-footer">
+      <button class="btn btn-primary" [disabled]="!canPublish || isPublishing" (click)="publish()">
+        {{ isPublishing ? 'Publishing...' : 'Publish' }}
+      </button>
+    </div>
+  </div>
+</div>

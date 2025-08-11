@@ -1,58 +1,654 @@
 <div class="bg-gray-100 p-6 min-h-screen">
+  <!-- Header Section -->
   <div class="flex justify-between items-center mb-6">
     <div>
-      <h1 class="mb-2 font-bold text-gray-900 text-3xl">Connect Your Social Accounts</h1>
-      <p class="text-gray-600">Link your social media accounts to SocialSync to schedule posts, analyze engagement, and manage all your social presence from one dashboard.</p>
+      <h1 class="mb-2 font-bold text-gray-900 text-3xl">Social Media Management Hub</h1>
     </div>
-    <button routerLink="/dashboard" class="flex items-center bg-white hover:bg-gray-50 shadow px-4 py-2 rounded-lg text-gray-700">
-      <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-      </svg>
-      Back to Dashboard
-    </button>
+    <div class="flex items-center gap-3">
+      <button routerLink="/dashboard"
+        class="flex items-center bg-white hover:bg-gray-50 shadow px-4 py-2 rounded-lg text-gray-700 transition">
+        <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+      <button (click)="refreshAccounts()"
+              [disabled]="isLoading()"
+              class="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 disabled:opacity-50 px-4 py-2 rounded-lg text-blue-700 transition">
+        <svg class="w-4 h-4" [class.animate-spin]="isLoading()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        {{ isLoading() ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
   </div>
 
-  <h2 class="mb-4 font-semibold text-gray-800 text-2xl">Available Platforms</h2>
-
-  <div class="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-    <!-- Facebook Card -->
-    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
-      <img src="png/facebook.png" alt="Facebook" class="mb-4 w-10 h-10">
-      <h3 class="mb-2 font-semibold text-gray-900 text-xl">Facebook</h3>
-      <p class="mb-6 text-gray-600 text-sm">Connect your Facebook profile or pages to schedule posts, analyze engagement, and manage comments.</p>
-      <button class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
-        Connect
-      </button>
+  <!-- Stats Cards -->
+  <div class="gap-4 grid grid-cols-1 md:grid-cols-5 mb-6">
+    <div class="bg-white shadow-sm p-4 border rounded-xl">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="font-medium text-gray-900 text-sm">Connected</p>
+          <p class="font-bold text-blue-600 text-2xl">{{ connectedAccounts().length }}</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Twitter Card -->
-    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
-      <img src="png/twitter.png" alt="Twitter" class="mb-4 w-10 h-10">
-      <h3 class="mb-2 font-semibold text-gray-900 text-xl">Twitter</h3>
-      <p class="mb-6 text-gray-600 text-sm">Link your Twitter account to schedule tweets, monitor mentions, and track engagement metrics.</p>
-      <button class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
-        Connect
-      </button>
+    <div class="bg-white shadow-sm p-4 border rounded-xl">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="font-medium text-gray-900 text-sm">Valid</p>
+          <p class="font-bold text-green-600 text-2xl">{{ validAccounts().length }}</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Instagram Card -->
-    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
-      <img src="png/instagram.png" alt="Instagram" class="mb-4 w-10 h-10">
-      <h3 class="mb-2 font-semibold text-gray-900 text-xl">Instagram</h3>
-      <p class="mb-6 text-gray-600 text-sm">Connect Instagram to schedule posts, analyze follower growth, and manage comments.</p>
-      <button class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
-        Connect
-      </button>
+    <div class="bg-white shadow-sm p-4 border rounded-xl">
+      <div class="flex items-center">
+        <div class="bg-red-100 p-3 rounded-lg">
+          <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="font-medium text-gray-900 text-sm">Expired</p>
+          <p class="font-bold text-red-600 text-2xl">{{ expiredAccounts().length }}</p>
+        </div>
+      </div>
     </div>
 
-    <!-- LinkedIn Card -->
-    <div class="flex flex-col items-center bg-white shadow-md p-6 rounded-lg text-center">
-      <img src="png/linkedin.png" alt="LinkedIn" class="mb-4 w-10 h-10">
-      <h3 class="mb-2 font-semibold text-gray-900 text-xl">LinkedIn</h3>
-      <p class="mb-6 text-gray-600 text-sm">Link your LinkedIn profile or company pages to schedule updates and track professional engagement.</p>
-      <button (click)="loginWithLinkedIn()" class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg w-full font-medium text-white">
-        Connect
-      </button>
+    <div class="bg-white shadow-sm p-4 border rounded-xl">
+      <div class="flex items-center">
+        <div class="bg-indigo-100 p-3 rounded-lg">
+          <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14 16a2 2 0 002-2v-3a2 2 0 00-2-2H6a2 2 0 00-2 2v3a2 2 0 002 2h8z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="font-medium text-gray-900 text-sm">FB Pages</p>
+          <p class="font-bold text-indigo-600 text-2xl">{{ facebookPages().length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-sm p-4 border rounded-xl">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="font-medium text-gray-900 text-sm">Instagram</p>
+          <p class="font-bold text-purple-600 text-2xl">{{ instagramAccounts().length }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Messages -->
+  @if (error()) {
+    <div class="bg-red-100 mb-4 px-4 py-3 border border-red-400 rounded text-red-700">
+      <strong class="font-bold">Error:</strong>
+      <span class="block sm:inline"> {{ error() }}</span>
+      <button (click)="clearResult()" class="float-right text-red-700 hover:text-red-900">×</button>
+    </div>
+  }
+
+  @if (result()) {
+    <div class="mb-4 px-4 py-3 border rounded"
+         [ngClass]="{
+           'bg-green-100 border-green-400 text-green-700': result()?.type === 'success',
+           'bg-red-100 border-red-400 text-red-700': result()?.type === 'error',
+           'bg-blue-100 border-blue-400 text-blue-700': result()?.type === 'info'
+         }">
+      <strong class="font-bold">{{ result()?.type === 'success' ? 'Success:' : result()?.type === 'error' ? 'Error:' : 'Info:' }}</strong>
+      <span class="block sm:inline"> {{ result()?.message }}</span>
+      <button (click)="clearResult()"
+              class="float-right hover:opacity-75"
+              [ngClass]="{
+                'text-green-700': result()?.type === 'success',
+                'text-red-700': result()?.type === 'error',
+                'text-blue-700': result()?.type === 'info'
+              }">×</button>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="flex justify-center items-center mt-8 py-12">
+      <div class="flex items-center gap-3 text-blue-600">
+        <svg class="w-8 h-8 text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-lg">Loading accounts...</span>
+      </div>
+    </div>
+  }
+
+  <!-- Social Media Management Benefits Section -->
+  <div class="bg-gradient-to-r from-blue-50 to-purple-50 mb-6 p-6 border rounded-xl">
+    <div class="gap-8 grid grid-cols-1 lg:grid-cols-2">
+      <div>
+        <h2 class="flex items-center mb-4 font-bold text-gray-900 text-xl">
+
+          Why Connect Your Social Media Accounts?
+        </h2>
+        <ul class="space-y-3 text-gray-700 text-sm">
+          <li class="flex items-start">
+            <svg class="flex-shrink-0 mt-0.5 mr-3 w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+              <strong>Centralized Management:</strong> Control all your social media accounts from one dashboard
+            </div>
+          </li>
+          <li class="flex items-start">
+            <svg class="flex-shrink-0 mt-0.5 mr-3 w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+              <strong>Time Efficiency:</strong> Schedule posts across multiple platforms simultaneously
+            </div>
+          </li>
+          <li class="flex items-start">
+            <svg class="flex-shrink-0 mt-0.5 mr-3 w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+              <strong>Analytics Insights:</strong> Comprehensive performance tracking and audience analysis
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="mb-4 font-bold text-gray-900 text-lg">Supported Platforms</h3>
+        <div class="gap-3 grid grid-cols-2">
+          <div class="flex items-center bg-white p-3 rounded-lg">
+            <img src="png/facebook.png" alt="Facebook" class="mr-2 w-6 h-6">
+            <div>
+              <div class="font-semibold text-gray-900 text-xs">Facebook</div>
+              <div class="text-gray-600 text-xs">Available Now</div>
+            </div>
+          </div>
+          <div class="flex items-center bg-white p-3 rounded-lg">
+            <img src="png/instagram.png" alt="Instagram" class="mr-2 w-6 h-6">
+            <div>
+              <div class="font-semibold text-gray-900 text-xs">Instagram</div>
+              <div class="text-gray-600 text-xs">Via Facebook</div>
+            </div>
+          </div>
+          <div class="flex items-center bg-white opacity-60 p-3 rounded-lg">
+            <img src="png/twitter.png" alt="Twitter" class="mr-2 w-6 h-6">
+            <div>
+              <div class="font-semibold text-gray-900 text-xs">Twitter/X</div>
+              <div class="text-gray-600 text-xs">Coming Soon</div>
+            </div>
+          </div>
+          <div class="flex items-center bg-white opacity-60 p-3 rounded-lg">
+            <img src="png/linkedin.png" alt="LinkedIn" class="mr-2 w-6 h-6">
+            <div>
+              <div class="font-semibold text-gray-900 text-xs">LinkedIn</div>
+              <div class="text-gray-600 text-xs">Coming Soon</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platform Cards with Equal Heights -->
+  <div class="items-stretch gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+
+    <!-- Facebook Platform Card -->
+    <div class="flex flex-col bg-white shadow-md p-6 rounded-lg h-full">
+      <!-- Header Section -->
+      <div class="flex items-center mb-4">
+        <img src="png/facebook.png" alt="Facebook" class="mr-3 w-10 h-10">
+        <div>
+          <h3 class="font-semibold text-gray-900 text-xl">Facebook</h3>
+          <p class="text-gray-600 text-sm">{{ facebookAccounts().length }} connected</p>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <p class="mb-4 text-gray-600 text-sm">
+        Connect your Facebook profiles and business pages to unlock powerful social media management capabilities. Schedule posts, manage comments, analyze engagement metrics, and reach your audience effectively.
+      </p>
+
+      <!-- Features Menu -->
+      <div class="bg-blue-50 mb-6 p-4 rounded-lg">
+        <h4 class="mb-2 font-semibold text-blue-900 text-sm">What you can do with Facebook:</h4>
+        <ul class="space-y-1 text-blue-800 text-xs">
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Schedule posts to profiles and pages
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Manage multiple business pages
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Track engagement and analytics
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Access connected Instagram accounts
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Monitor comments and messages
+          </li>
+        </ul>
+      </div>
+
+      <!-- Content Section - Expandable -->
+      <div class="flex-grow">
+        @if (facebookAccounts().length > 0) {
+          <div class="space-y-4">
+            @for (account of facebookAccounts(); track account.id) {
+              <div class="bg-gray-50 p-3 border rounded-lg">
+                <div class="flex items-center mb-3">
+                  <div class="relative">
+                    <img [src]="account.accountProfilePic"
+                         [alt]="account.accountName"
+                         class="border-2 border-green-500 rounded-full w-12 h-12 object-cover"
+                         onerror="this.src='png/facebook.png'">
+                    <div class="-right-1 -bottom-1 absolute bg-green-500 border-2 border-white rounded-full w-4 h-4">
+                      <svg class="mt-0.5 ml-0.5 w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="flex-1 ml-3">
+                    <h4 class="font-semibold text-gray-900 text-sm">{{ account.accountName }}</h4>
+                    <p class="text-gray-600 text-xs">{{ '@' + account.accountUsername }}</p>
+                    <span [class]="'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ' + getStatusBadgeClass(account)">
+                      {{ getStatusText(account) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="flex space-x-2 text-xs">
+                  <button (click)="validateToken(account)"
+                          [disabled]="isValidating() === account.id"
+                          class="flex-1 bg-green-100 hover:bg-green-200 disabled:opacity-50 px-2 py-1 rounded font-semibold text-green-700 disabled:cursor-not-allowed">
+                    {{ isValidating() === account.id ? 'Validating...' : 'Validate' }}
+                  </button>
+                  <button (click)="refreshToken(account)"
+                          [disabled]="isRefreshing() === account.id"
+                          class="flex-1 bg-blue-100 hover:bg-blue-200 disabled:opacity-50 px-2 py-1 rounded font-semibold text-blue-700 disabled:cursor-not-allowed">
+                    {{ isRefreshing() === account.id ? 'Refreshing...' : 'Refresh' }}
+                  </button>
+                  <button (click)="disconnectAccount(account)"
+                          [disabled]="isDisconnecting() === account.id"
+                          class="flex-1 bg-red-100 hover:bg-red-200 disabled:opacity-50 px-2 py-1 rounded font-semibold text-red-700 disabled:cursor-not-allowed">
+                    {{ isDisconnecting() === account.id ? 'Disconnecting...' : 'Disconnect' }}
+                  </button>
+                </div>
+
+                <!-- Facebook Pages Section -->
+                @if (enhancedAccountData().get(account.id)?.pages && enhancedAccountData().get(account.id)!.pages!.length > 0) {
+                  <div class="mt-3 pt-3 border-gray-200 border-t">
+                    <h5 class="flex items-center mb-2 font-semibold text-gray-700 text-xs">
+                      <svg class="mr-1 w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14 16a2 2 0 002-2v-3a2 2 0 00-2-2H6a2 2 0 00-2 2v3a2 2 0 002 2h8z"></path>
+                      </svg>
+                      Facebook Pages ({{ enhancedAccountData().get(account.id)!.pages!.length }})
+                    </h5>
+
+                    <div class="space-y-2">
+                      @for (page of enhancedAccountData().get(account.id)!.pages!; track page.id) {
+                        <div class="bg-white p-2 border border-gray-200 rounded">
+                          <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                              <h6 class="font-medium text-gray-900 text-xs">{{ page.name }}</h6>
+                              <p class="text-gray-500 text-xs">{{ page.category }}</p>
+                              @if (page.is_verified) {
+                                <span class="inline-flex items-center bg-blue-100 mt-1 px-1.5 py-0.5 rounded-full font-medium text-blue-800 text-xs">
+                                  <svg class="mr-1 w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                  </svg>
+                                  Verified
+                                </span>
+                              }
+                            </div>
+                            @if (page.fan_count) {
+                              <div class="text-right">
+                                <div class="font-medium text-blue-600 text-xs">{{ formatNumber(page.fan_count) }}</div>
+                                <div class="text-gray-500 text-xs">fans</div>
+                              </div>
+                            }
+                          </div>
+                          @if (page.about) {
+                            <div class="mt-1">
+                              <p class="text-gray-600 text-xs truncate">{{ page.about }}</p>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Action Button - Always at Bottom -->
+      <div class="mt-6">
+        @if (facebookAccounts().length === 0) {
+          <button (click)="connectFacebookAccount()"
+                  [disabled]="isConnecting()"
+                  class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-4 py-2 rounded-lg w-full font-medium text-white disabled:cursor-not-allowed">
+            @if (isConnecting()) {
+              <svg class="mr-3 -ml-1 w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Connecting...
+            } @else {
+              Connect Facebook
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Instagram Platform Card -->
+    <div class="flex flex-col bg-white shadow-md p-6 rounded-lg h-full">
+      <!-- Header Section -->
+      <div class="flex items-center mb-4">
+        <img src="png/instagram.png" alt="Instagram" class="mr-3 w-10 h-10">
+        <div>
+          <h3 class="font-semibold text-gray-900 text-xl">Instagram</h3>
+          <p class="text-gray-600 text-sm">{{ instagramAccounts().length }} connected</p>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <p class="mb-4 text-gray-600 text-sm">
+        Manage your Instagram Business accounts seamlessly through Facebook Business integration. Create stunning visual content and engage with your community.
+      </p>
+
+      <!-- Features Menu -->
+      <div class="bg-blue-50 mb-6 p-4 rounded-lg">
+        <h4 class="mb-2 font-semibold !text-purple-900 text-sm">Instagram capabilities:</h4>
+        <ul class="space-y-1 !text-blue-800 text-xs">
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Schedule photos and videos
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Create Instagram Stories
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Track follower growth
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Analyze post performance
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Manage hashtags and mentions
+          </li>
+        </ul>
+      </div>
+
+      <!-- Content Section - Expandable -->
+      <div class="flex-grow">
+        @if (instagramAccounts().length > 0) {
+          <div class="space-y-4">
+            @for (igAccount of instagramAccounts(); track igAccount.id) {
+              <div class="bg-gray-50 p-3 border rounded-lg">
+                <div class="flex items-center mb-3">
+                  <div class="relative">
+                    <img [src]="igAccount.profile_picture_url"
+                         [alt]="igAccount.name"
+                         class="border-2 border-purple-500 rounded-full w-12 h-12 object-cover"
+                         onerror="this.src='png/instagram.png'">
+                    <div class="-right-1 -bottom-1 absolute bg-purple-500 border-2 border-white rounded-full w-4 h-4">
+                      <svg class="mt-0.5 ml-0.5 w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="flex-1 ml-3">
+                    <h4 class="font-semibold text-gray-900 text-sm">{{ igAccount.name }}</h4>
+                    <p class="text-gray-600 text-xs">{{ '@' + igAccount.username }}</p>
+                    <p class="text-gray-500 text-xs">{{ formatNumber(igAccount.followers_count) }} followers</p>
+                  </div>
+                </div>
+
+                @if (igAccount.connected_page) {
+                  <div class="bg-blue-50 p-2 rounded text-xs">
+                    <span class="font-medium text-blue-600">Connected via:</span>
+                    <span class="text-blue-800">{{ igAccount.connected_page.name }}</span>
+                  </div>
+                }
+
+                <div class="gap-2 grid grid-cols-2 mt-2 text-xs">
+                  <div class="bg-white p-2 rounded text-center">
+                    <div class="font-semibold text-gray-900">{{ formatNumber(igAccount.media_count) }}</div>
+                    <div class="text-gray-600">Posts</div>
+                  </div>
+                  <div class="bg-white p-2 rounded text-center">
+                    <div class="font-semibold text-gray-900">{{ formatNumber(igAccount.followers_count) }}</div>
+                    <div class="text-gray-600">Followers</div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Action Button - Always at Bottom -->
+      <div class="mt-6">
+        @if (instagramAccounts().length === 0) {
+          <div class="text-center">
+            <div class="mb-4 text-gray-600 text-sm">
+              <strong>How to connect Instagram:</strong><br>
+              Instagram Business accounts are connected through Facebook Business pages. First connect your Facebook account, then your Instagram Business accounts will automatically appear here.
+            </div>
+            <button disabled
+              class="flex justify-center items-center bg-gray-400 px-4 py-2 rounded-lg w-full font-medium text-white cursor-not-allowed">
+              Connect Facebook First
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Twitter Platform Card -->
+    <div class="flex flex-col bg-white shadow-md p-6 rounded-lg h-full">
+      <!-- Header Section -->
+      <div class="flex items-center mb-4">
+        <img src="png/twitter.png" alt="Twitter" class="mr-3 w-10 h-10">
+        <div>
+          <h3 class="font-semibold text-gray-900 text-xl">Twitter</h3>
+          <p class="text-gray-600 text-sm">0 connected</p>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <p class="mb-4 text-gray-600 text-sm">
+        Connect your Twitter/X account to engage in real-time conversations, share updates, and build your professional network through tweets and threads.
+      </p>
+
+      <!-- Features Menu -->
+      <div class="bg-blue-50 mb-6 p-4 rounded-lg">
+        <h4 class="mb-2 font-semibold text-blue-900 text-sm">Coming soon - Twitter features:</h4>
+        <ul class="space-y-1 text-blue-800 text-xs">
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Schedule tweets and threads
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Monitor mentions and hashtags
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Track engagement metrics
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Manage direct messages
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Analyze follower insights
+          </li>
+        </ul>
+      </div>
+
+      <!-- Content Section - Expandable -->
+      <div class="flex-grow">
+        <div class="bg-yellow-50 p-4 border border-yellow-200 rounded-lg">
+          <div class="flex items-center mb-2">
+            <svg class="mr-2 w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <h5 class="font-semibold text-yellow-800 text-sm">Twitter Integration Status</h5>
+          </div>
+          <p class="text-yellow-700 text-xs">
+            We're working on Twitter/X API integration. Due to recent changes in Twitter's API policies, we're implementing new authentication methods to ensure secure and reliable connectivity.
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Button - Always at Bottom -->
+      <div class="mt-6">
+        <button disabled
+          class="flex justify-center items-center bg-gray-400 px-4 py-2 rounded-lg w-full font-medium text-white cursor-not-allowed">
+          Coming Soon
+        </button>
+      </div>
+    </div>
+
+    <!-- LinkedIn Platform Card -->
+    <div class="flex flex-col bg-white shadow-md p-6 rounded-lg h-full">
+      <!-- Header Section -->
+      <div class="flex items-center mb-4">
+        <img src="png/linkedin.png" alt="LinkedIn" class="mr-3 w-10 h-10">
+        <div>
+          <h3 class="font-semibold text-gray-900 text-xl">LinkedIn</h3>
+          <p class="text-gray-600 text-sm">0 connected</p>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <p class="mb-4 text-gray-600 text-sm">
+        Connect your LinkedIn profile and company pages to establish thought leadership, share professional content, and network with industry peers.
+      </p>
+
+      <!-- Features Menu -->
+      <div class="bg-blue-50 mb-6 p-4 rounded-lg">
+        <h4 class="mb-2 font-semibold text-blue-900 text-sm">Coming soon - LinkedIn features:</h4>
+        <ul class="space-y-1 text-blue-800 text-xs">
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Schedule professional posts
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Manage company pages
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Track professional engagement
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Share industry insights
+          </li>
+          <li class="flex items-center">
+            <svg class="mr-2 w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+            </svg>
+            Network with professionals
+          </li>
+        </ul>
+      </div>
+
+      <!-- Content Section - Expandable -->
+      <div class="flex-grow">
+        <div class="bg-blue-50 p-4 border border-blue-200 rounded-lg">
+          <div class="flex items-center mb-2">
+            <svg class="mr-2 w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <h5 class="font-semibold text-blue-800 text-sm">LinkedIn Integration</h5>
+          </div>
+          <p class="text-blue-700 text-xs">
+            LinkedIn integration is in development. We're implementing their latest API to provide seamless professional networking and content management capabilities.
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Button - Always at Bottom -->
+      <div class="mt-6">
+        <button disabled
+          class="flex justify-center items-center bg-gray-400 px-4 py-2 rounded-lg w-full font-medium text-white cursor-not-allowed">
+          Coming Soon
+        </button>
+      </div>
     </div>
   </div>
 </div>
+

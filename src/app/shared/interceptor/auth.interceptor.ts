@@ -1,62 +1,69 @@
+import { Observable } from 'rxjs';
 import { inject } from '@angular/core';
-import { HttpRequest, HttpErrorResponse, HttpHandlerFn } from '@angular/common/http';
-import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { TokenService } from '../../core/services/token.service';
 import { environment } from '../../../environment/environment';
+import { HttpRetryService } from '../services/http-retry.service';
+import { HttpErrorHandlerService } from '../services/http-error-handler.service';
+import { AUTH_CONFIG, HTTP_HEADERS, CONTENT_TYPES } from '../constants/http.constants';
+import { HttpRequest, HttpErrorResponse, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 
-export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
 
-  const router = inject(Router);
-  const token = inject(TokenService).getToken();
+export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
 
-  let authReq = req;
+  const tokenService = inject(TokenService);
+  const errorHandler = inject(HttpErrorHandlerService);
+  const retryService = inject(HttpRetryService);
 
-  if (token && req.url.startsWith(environment.apiUrl)) {
-    authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-  }
-  return next(authReq).pipe(
-    catchError((error: HttpErrorResponse) => {
-      let errorMessage = 'An unexpected error occurred';
-      if (!error.status && error.statusText === 'Unknown Error') {
-        errorMessage = 'No network connection. Please check your internet.';
-        console.error(errorMessage);
-      } else {
-        switch (error.status) {
-          case 400:
-            errorMessage = 'Bad Request: Please check your input.';
-            break;
-          case 401:
-            case 401:
-            errorMessage = 'Unauthorized: Please log in again.';
-            if (!req.url.includes('/validate-token')) {
-              localStorage.removeItem('access_token');
-              router.navigate(['/login'], {
-                queryParams: { returnUrl: router.url }
-              });
-            }
-            break;
-          case 403:
-            errorMessage = 'Forbidden: You do not have access.';
-            router.navigate(['/forbidden']);
-            break;
-          case 404:
-            errorMessage = 'Resource not found.';
-            break;
-          case 500:
-            errorMessage = 'Server error. Please try again later.';
-            break;
-        }
-      }
-      console.error('HTTP Error:', error);
-      return throwError(() => new Error(errorMessage));
-    })
+  const authenticatedRequest = addAuthenticationHeader(req, tokenService);
+  const retryConfig = retryService.getRetryConfigForRequest(authenticatedRequest);
+
+  return next(authenticatedRequest).pipe(
+    retryService.createRetryOperator<HttpEvent<unknown>>(retryConfig),
+    catchError((error: HttpErrorResponse) =>
+      errorHandler.handleError(error, {
+        showToast: shouldShowToast(req),
+        logError: true,
+        redirectOnUnauthorized: shouldRedirectOnUnauthorized(req)
+      })
+    )
   );
+};
 
-}
+const addAuthenticationHeader = (request: HttpRequest<unknown>, tokenService: TokenService): HttpRequest<unknown> => {
+  if (!shouldAddAuthHeader(request)) return request;
+  const token = tokenService.getToken();
+  if (!token) return request;
+
+  return request.clone({
+    setHeaders: {
+      [HTTP_HEADERS.AUTHORIZATION]: `${AUTH_CONFIG.BEARER_PREFIX} ${token}`,
+      [HTTP_HEADERS.CONTENT_TYPE]: getContentType(request),
+      [HTTP_HEADERS.X_REQUESTED_WITH]: 'XMLHttpRequest'
+    }
+  });
+};
+
+const shouldAddAuthHeader = (request: HttpRequest<unknown>): boolean => {
+  if (!request.url.startsWith(environment.apiUrl)) return false;
+  const publicEndpoints = ['/auth/login', '/auth/register', '/auth/forgot-password'];
+  return !publicEndpoints.some(endpoint => request.url.includes(endpoint));
+};
+
+const getContentType = (request: HttpRequest<unknown>): string => {
+  if (request.body instanceof FormData) {
+    return request.headers.get(HTTP_HEADERS.CONTENT_TYPE) ?? '';
+  }
+  return request.headers.get(HTTP_HEADERS.CONTENT_TYPE) ?? CONTENT_TYPES.JSON;
+};
+
+
+const shouldShowToast = (request: HttpRequest<unknown>): boolean => {
+  const silentEndpoints = ['/health', '/ping', '/validate-token'];
+  return !silentEndpoints.some(endpoint => request.url.includes(endpoint));
+};
+
+const shouldRedirectOnUnauthorized = (request: HttpRequest<unknown>): boolean => {
+  const { SKIP_TOKEN_URLS } = AUTH_CONFIG; // Destructuring assignment
+  return !SKIP_TOKEN_URLS.some(endpoint => request.url.includes(endpoint));
+};

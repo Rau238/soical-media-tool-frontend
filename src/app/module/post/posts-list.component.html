@@ -1,0 +1,226 @@
+<div class="px-4 py-4">
+  <div class="flex xl:flex-row flex-col justify-between items-stretch xl:items-center gap-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <label class="font-semibold text-slate-700 text-sm">Account</label>
+        <select (change)="onSelectAccount($any($event.target).value)"
+          class="px-3 border border-slate-200 rounded-xl h-10 text-sm">
+          <option *ngFor="let acc of facebookAccounts" [value]="acc._id || acc.id">{{ acc.accountName }}</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2" *ngIf="target==='page'">
+        <label class="font-semibold text-slate-700 text-sm">Page</label>
+        <select [(ngModel)]="selectedPageId" (change)="refreshList()"
+          class="px-3 border border-slate-200 rounded-xl h-10 text-sm">
+          <option *ngFor="let page of facebookPages" [value]="page.id">{{ page.name }}</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2" *ngIf="target==='instagram'">
+        <label class="font-semibold text-slate-700 text-sm">Instagram</label>
+        <select [(ngModel)]="selectedInstagramId" (change)="refreshList()"
+          class="px-3 border border-slate-200 rounded-xl h-10 text-sm">
+          <option *ngFor="let ig of instagramAccounts" [value]="ig.id">{{ ig.username }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Platform segmented control (scalable) -->
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <div class="flex gap-1 bg-slate-100 p-1 rounded-full">
+        <button (click)="onChangeTarget('page')"
+          [class]="'px-4 h-9 rounded-full text-sm ' + (target==='page' ? 'bg-white shadow text-slate-900' : 'text-slate-600')">Facebook
+          Page</button>
+        <button (click)="onChangeTarget('instagram')"
+          [class]="'px-4 h-9 rounded-full text-sm ' + (target==='instagram' ? 'bg-white shadow text-slate-900' : 'text-slate-600')">Instagram</button>
+        <!-- Future platforms: add more buttons here -->
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button class="px-4 border border-slate-200 rounded-xl h-10 text-slate-800 text-sm" (click)="refreshList()"
+        [disabled]="isRefreshing">
+        {{ isRefreshing ? 'Refreshing…' : 'Refresh' }}
+      </button>
+      <a href="/create-post"
+        class="flex items-center bg-gradient-to-r from-blue-600 to-violet-600 px-4 rounded-xl h-10 text-white text-sm">Create
+        Post</a>
+    </div>
+  </div>
+
+  <div *ngIf="target==='page'" class="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
+    <ng-container *ngIf="isRefreshing && (!posts || posts.length===0)">
+      <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="bg-white shadow rounded-xl overflow-hidden animate-pulse">
+        <div class="bg-slate-200 w-full h-44"></div>
+        <div class="space-y-2 p-4">
+          <div class="bg-slate-200 rounded w-24 h-3"></div>
+          <div class="bg-slate-200 rounded h-3"></div>
+          <div class="bg-slate-200 rounded w-3/4 h-3"></div>
+        </div>
+        <div class="flex justify-between items-center px-4 py-3 border-slate-100 border-t">
+          <div class="bg-slate-200 rounded w-16 h-6"></div>
+          <div class="flex gap-2">
+            <div class="bg-slate-200 rounded w-16 h-9"></div>
+            <div class="bg-slate-200 rounded w-16 h-9"></div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <div *ngFor="let post of posts" class="flex flex-col">
+      <app-card elevation="md" rounded="xl" [hover]="true">
+        <div card-media *ngIf="post.full_picture" class="relative w-full h-44 overflow-hidden">
+          <div *ngIf="!imageLoadedPosts.has(post.id)" class="absolute inset-0 bg-slate-200 animate-pulse"></div>
+          <img [src]="post.full_picture" class="w-full h-full object-cover" (load)="imageLoadedPosts.add(post.id)" />
+        </div>
+        <div class="flex-1">
+          <div class="flex justify-between items-center mb-2 text-slate-500 text-xs">
+            <a [href]="post.permalink_url" target="_blank" class="hover:text-slate-700">Open</a>
+            <span>{{ post.created_time | date:'mediumDate' }} · {{ post.created_time | date:'shortTime' }}</span>
+          </div>
+          <div *ngIf="editingPostId!==post.id; else editPostTpl" class="space-y-2">
+            <p [ngClass]="expandedPosts.has(post.id) ? '' : 'max-h-24 overflow-hidden'"
+              class="text-slate-800 text-sm whitespace-pre-wrap">
+              {{ post.message || '(No message)' }}
+            </p>
+            <button *ngIf="post.message && post.message.length>160" (click)="togglePostExpand(post.id)"
+              class="text-blue-600 text-sm">
+              {{ expandedPosts.has(post.id) ? 'Show less' : 'Show more' }}
+            </button>
+          </div>
+          <ng-template #editPostTpl>
+            <textarea rows="4" [(ngModel)]="editingMessage"
+              class="p-2 border border-slate-200 rounded-lg w-full text-sm"></textarea>
+          </ng-template>
+        </div>
+        <div card-footer>
+          <div class="flex justify-between items-center mx-auto w-full">
+            <div class="flex items-center gap-2 text-[10px]">
+              <span *ngIf="post.status_type"
+                class="bg-slate-100 px-2 py-1 rounded-full text-slate-700">{{ post.status_type }}</span>
+              <span *ngIf="post.is_hidden" class="bg-amber-100 px-2 py-1 rounded-full text-amber-800">Hidden</span>
+            </div>
+            <div *ngIf="editingPostId!==post.id" class="flex items-center gap-2">
+              <button (click)="startEditPost(post)"
+                class="place-items-center grid border border-slate-200 rounded-lg w-9 h-9 text-slate-700" title="Edit">
+                <i class="fa-pen-to-square fa-regular"></i>
+              </button>
+              <button (click)="deletePost(post)"
+                class="place-items-center grid border border-rose-200 rounded-lg w-9 h-9 text-rose-600"
+                title="Delete post">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+            <div *ngIf="editingPostId===post.id" class="flex items-center gap-2">
+              <button (click)="cancelEditPost()"
+                class="px-3 border border-slate-200 rounded-lg h-9 text-slate-800 text-sm">Cancel</button>
+              <button (click)="saveEditPost(post)"
+                class="bg-blue-600 px-3 rounded-lg h-9 text-white text-sm">Save</button>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  </div>
+  <app-pagination *ngIf="target==='page' && posts?.length" [hasPrev]="!!fbPrev" [hasNext]="!!fbNext"
+    [loading]="isRefreshing" align="center" (prev)="prevPage()" (next)="nextPage()"></app-pagination>
+
+  <div *ngIf="target==='instagram'" class="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
+    <ng-container *ngIf="isRefreshing && (!igMedia || igMedia.length===0)">
+      <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="bg-white shadow rounded-xl overflow-hidden animate-pulse">
+        <div class="bg-slate-200 w-full h-44"></div>
+        <div class="space-y-2 p-4">
+          <div class="bg-slate-200 rounded w-24 h-3"></div>
+          <div class="bg-slate-200 rounded h-3"></div>
+          <div class="bg-slate-200 rounded w-3/4 h-3"></div>
+        </div>
+        <div class="flex justify-between items-center px-4 py-3 border-slate-100 border-t">
+          <div class="bg-slate-200 rounded w-16 h-6"></div>
+          <div class="flex gap-2">
+            <div class="bg-slate-200 rounded w-16 h-9"></div>
+            <div class="bg-slate-200 rounded w-16 h-9"></div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <div *ngFor="let item of igMedia">
+      <app-card elevation="md" rounded="xl" [hover]="true">
+        <div card-media *ngIf="item.media_url" class="relative w-full h-44 overflow-hidden">
+          <div *ngIf="!imageLoadedMedia.has(item.id)" class="absolute inset-0 bg-slate-200 animate-pulse"></div>
+          <img [src]="item.media_url" class="w-full h-full object-cover" (load)="imageLoadedMedia.add(item.id)" />
+        </div>
+        <div class="flex-1">
+          <div class="flex justify-between items-center mb-2 text-slate-500 text-xs">
+            <a [href]="item.permalink" target="_blank" class="hover:text-slate-700">Open</a>
+            <span>{{ item.timestamp | date:'mediumDate' }} · {{ item.timestamp | date:'shortTime' }}</span>
+          </div>
+          <div *ngIf="editingMediaId!==item.id; else editMediaTpl" class="space-y-2">
+            <p [ngClass]="expandedMedia.has(item.id) ? '' : 'max-h-24 overflow-hidden'"
+              class="text-slate-800 text-sm whitespace-pre-wrap">
+              {{ item.caption || '(No caption)' }}
+            </p>
+            <button *ngIf="item.caption && item.caption.length>160" (click)="toggleMediaExpand(item.id)"
+              class="text-blue-600 text-sm">
+              {{ expandedMedia.has(item.id) ? 'Show less' : 'Show more' }}
+            </button>
+          </div>
+          <ng-template #editMediaTpl>
+            <div class="space-y-3">
+              <div>
+                <label class="block mb-1 text-slate-700 text-sm">New caption (repost)</label>
+                <textarea rows="3" [(ngModel)]="editingNewCaption"
+                  class="p-2 border border-slate-200 rounded-lg w-full text-sm"></textarea>
+                <label class="flex items-center gap-2 mt-2 text-slate-600 text-xs">
+                  <input type="checkbox" [(ngModel)]="deleteOriginalAfterRepost" />
+                  Delete original after repost
+                </label>
+                <button type="button" (click)="repostWithNewCaption(item)"
+                  class="bg-violet-600 mt-2 px-3 rounded-lg h-9 text-white text-sm">Repost with caption</button>
+              </div>
+              <div class="pt-2 border-slate-100 border-t">
+                <label class="flex items-center gap-3 text-slate-700 text-sm">
+                  <span>Comments</span>
+                  <select [(ngModel)]="editingCommentsEnabled"
+                    class="px-2 border border-slate-200 rounded-lg h-9 text-sm">
+                    <option [ngValue]="true">Enabled</option>
+                    <option [ngValue]="false">Disabled</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+        <div card-footer>
+          <div class="flex justify-between items-center mx-auto w-full">
+          <div class="flex items-center gap-2 text-[10px]">
+            <span class="bg-slate-100 px-2 py-1 rounded-full text-slate-700">{{ item.media_type }}</span>
+          </div>
+          <div *ngIf="editingMediaId!==item.id" class="flex items-center gap-2">
+            <button (click)="startEditMedia(item)" [disabled]="isActionInFlight"
+              class="place-items-center grid border border-slate-200 rounded-lg w-9 h-9 text-slate-700" title="Edit">
+              <i class="fa-pen-to-square fa-regular"></i>
+            </button>
+            <button (click)="disableComments(item)" [disabled]="isActionInFlight"
+              class="place-items-center grid border border-amber-200 rounded-lg w-9 h-9 text-amber-700"
+              title="Disable comments">
+              <i class="fa-solid fa-comment-slash"></i>
+            </button>
+          </div>
+          <div *ngIf="editingMediaId===item.id" class="flex items-center gap-2">
+            <button (click)="cancelEditMedia()" [disabled]="isActionInFlight"
+              class="px-3 border border-slate-200 rounded-lg h-9 text-slate-800 text-sm">Cancel</button>
+            <button (click)="saveEditMedia(item)" [disabled]="isActionInFlight"
+              class="bg-blue-600 px-3 rounded-lg h-9 text-white text-sm">
+              <span *ngIf="!isActionInFlight">Save</span>
+              <span *ngIf="isActionInFlight">Saving…</span>
+            </button>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  </div>
+  <app-pagination *ngIf="target==='instagram' && igMedia?.length" [hasPrev]="!!igPrev" [hasNext]="!!igNext"
+    [loading]="isRefreshing" align="center" (prev)="prevPage()" (next)="nextPage()"></app-pagination>
+  <app-dialog></app-dialog>
+</div>

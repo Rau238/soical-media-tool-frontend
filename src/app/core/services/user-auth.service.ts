@@ -1,100 +1,182 @@
+// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap, catchError, switchMap } from 'rxjs/operators';
-import { ApiService } from './api.service';
-import { TokenService } from './token.service';
-import { User } from '../models/user.model';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { environment } from 'src/environment/environment';
 
-interface ResponseData extends MessageResponse{
+export interface LoginResponse {
   success: boolean;
-  data: {
-    _id: string;
-    name: string;
-    email: string;
+  message: string;
+  data?: {
     token: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
   };
 }
 
-interface MessageResponse  {
-  success?: boolean;
-  message?: string;
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
 }
 
-
+export interface LoginData {
+  email: string;
+  password: string;
+}
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class UserAuthService {
-  private userSubject = new BehaviorSubject<User | null>(null);
-  user$ = this.userSubject.asObservable();
+export class AuthService {
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(
-    private apiService: ApiService,
-    private tokenService: TokenService
-  ) {
-    // Check for existing token and fetch user on app initialization
-    this.tokenService.token$.subscribe((token) => {
-      if (token) {
-        this.getCurrentUser().subscribe({
-          next: (user) => this.userSubject.next(user),
-          error: () => this.logout(),
-        });
-      } else {
-        this.userSubject.next(null);
-      }
+  constructor(private http: HttpClient) {
+    // Check if user is already logged in
+    const token = this.getToken();
+    if (token) {
+      // You might want to validate the token here
+      this.currentUserSubject.next({ token });
+    }
+  }
+
+  /**
+   * Register new user
+   */
+  register(userData: RegisterData): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}${environment.apiEndpoints.auth}/register`,
+      userData
+    ).pipe(
+      map(response => {
+        if (response.success && response.data?.token) {
+          this.setToken(response.data.token);
+          this.currentUserSubject.next(response.data);
+        }
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Login user
+   */
+  login(credentials: LoginData): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}${environment.apiEndpoints.auth}/login`,
+      credentials
+    ).pipe(
+      map(response => {
+        if (response.success && response.data?.token) {
+          this.setToken(response.data.token);
+          this.currentUserSubject.next(response.data);
+        }
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Logout user
+   */
+  logout(): Observable<any> {
+    return this.http.post(
+      `${environment.apiUrl}${environment.apiEndpoints.auth}/logout`,
+      {},
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      map(response => {
+        this.removeToken();
+        this.currentUserSubject.next(null);
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Get current user profile
+   */
+  getProfile(): Observable<any> {
+    return this.http.get(
+      `${environment.apiUrl}${environment.apiEndpoints.users}/profile`,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+
+    // Check if token is expired (basic check)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      return payload.exp > currentTime;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Get JWT token from localStorage
+   */
+  getToken(): string | null {
+    return localStorage.getItem('jwt_token') || localStorage.getItem('token');
+  }
+
+  /**
+   * Set JWT token in localStorage
+   */
+  private setToken(token: string): void {
+    localStorage.setItem('jwt_token', token);
+  }
+
+  /**
+   * Remove JWT token from localStorage
+   */
+  private removeToken(): void {
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('token');
+  }
+
+  /**
+   * Get authorization headers
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
   }
 
-  signup(name: string, email: string, password: string): Observable<ResponseData> {
-    return this.apiService.post<ResponseData>('/api/v1/auth/register', { name, email, password }, false).pipe(
-      tap((response) => {
-        this.tokenService.setToken(response.data.token);
-        this.userSubject.next({_id: response.data._id,name: response.data.name,email: response.data.email,});
-      })
-    );
-  }
+  /**
+   * Handle HTTP errors
+   */
+  private handleError(error: any): Observable<never> {
+    console.error('Auth Service Error:', error);
 
-  login(email: string, password: string): Observable<ResponseData> {
-    return this.apiService.post<ResponseData>('/api/v1/auth/login', { email, password }, false).pipe(
-      tap((response) => {
-        this.tokenService.setToken(response.data.token);
-        this.userSubject.next({_id: response.data._id,name: response.data.name,email: response.data.email,});
-      })
-    );
-  }
+    let errorMessage = 'An unknown error occurred';
 
-  googleLogin(code: string): Observable<ResponseData> {
-    return this.apiService.post<ResponseData>('/api/v1/auth/google', { code }, false).pipe(
-      tap((response) => {
-        this.tokenService.setToken(response.data.token);
-        this.userSubject.next({_id: response.data._id,name: response.data.name,email: response.data.email,});
-      })
-    );
-  }
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = error.error.message;
+    } else {
+      errorMessage = error.error?.message || error.message || `Error Code: ${error.status}`;
+    }
 
-  forgotPassword(email: string): Observable<ResponseData> {
-    return this.apiService.post<ResponseData>('/api/v1/auth/forgot-password', { email }, false);
-  }
-
-  resetPassword(resettoken: string, password: string): Observable<ResponseData> {
-    return this.apiService.post<ResponseData>(`/api/v1/auth/reset-password/${resettoken}`, { password }, false).pipe(
-      tap((response) => {
-        this.tokenService.setToken(response.data.token);
-        this.userSubject.next({_id: response.data._id,name: response.data.name,email: response.data.email,});
-      })
-    );
-  }
-
-  getCurrentUser(): Observable<User> {
-    return this.apiService.get<{ success: boolean; data: User }>('/api/v1/auth/profile').pipe(
-      tap((response) => this.userSubject.next(response.data)),
-      switchMap((response) => of(response.data))
-    );
-  }
-
-  logout(): void {
-    this.tokenService.clearToken();
-    this.userSubject.next(null);
+    throw new Error(errorMessage);
   }
 }

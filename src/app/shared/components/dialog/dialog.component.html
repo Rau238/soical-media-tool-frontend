@@ -1,0 +1,58 @@
+@if (dialogService.isOpen()) {
+  <div class="z-50 fixed inset-0 overflow-y-auto" aria-labelledby="dialog-title"
+    aria-modal="true" role="dialog">
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black/50 transition-opacity" [@fadeInOut] (click)="dialogService.cancel()"></div>
+
+    <!-- Dialog container -->
+    <div class="flex justify-center items-center p-4 min-h-screen">
+      <!-- Dialog panel -->
+      <div class="relative bg-white dark:bg-gray-800 shadow-xl rounded-lg w-full overflow-hidden text-left transition-all transform"
+        [class]="sizeClass()" [@slideInOut]>
+
+        <!-- Header -->
+        <div class="flex justify-between items-center p-4 border-gray-200 dark:border-gray-700 border-b">
+          <h3 class="font-medium text-gray-900 dark:text-white text-lg" id="dialog-title">
+            {{ dialogService.config()?.title }}
+          </h3>
+
+          @if (dialogService.config()?.showClose) {
+            <button type="button"
+              class="bg-white dark:bg-gray-800 rounded-md focus:outline-none text-gray-400 hover:text-gray-500 dark:hover:text-gray-200 dark:text-gray-300 transition-colors"
+              (click)="dialogService.cancel()" aria-label="Close">
+              <span class="sr-only">Close</span>
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          }
+        </div>
+
+        <!-- Content -->
+        <div class="p-4">
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">{{ dialogService.config()?.content }}</p>
+
+          <!-- Content projection for custom content -->
+          <div class="mt-4">
+            <ng-content></ng-content>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end gap-3 bg-gray-50 dark:bg-gray-700/50 px-4 py-3 border-gray-200 dark:border-gray-700 border-t">
+          <button type="button"
+            class="hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium text-gray-700 dark:text-gray-300 text-sm transition-colors"
+            (click)="dialogService.cancel()">
+            {{ dialogService.config()?.cancelText || 'Cancel' }}
+          </button>
+
+          <button type="button"
+            class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-white text-sm transition-colors"
+            (click)="dialogService.confirm()">
+            {{ dialogService.config()?.confirmText || 'Confirm' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,89 @@
+/* Header Component Styles */
+
+/* Dropdown animations */
+.profile-menu,
+.notification-menu {
+  animation: slideDown 0.2s ease-out;
+  transform-origin: top;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth transitions for interactive elements */
+.menu-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.menu-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Notification badge pulse animation */
+.notification-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Enhanced focus states for accessibility */
+.menu-button:focus,
+button:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/* Scroll behavior for notification menu */
+.notification-menu .max-h-96 {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb #f9fafb;
+}
+
+.notification-menu .max-h-96::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-menu .max-h-96::-webkit-scrollbar-track {
+  background: #f9fafb;
+}
+
+.notification-menu .max-h-96::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-menu,
+  .notification-menu {
+    left: 0;
+    right: 0;
+    width: calc(100vw - 2rem);
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .w-80 {
+    width: 100%;
+    max-width: 280px;
+  }
+}

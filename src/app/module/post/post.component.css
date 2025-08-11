@@ -1,0 +1,115 @@
+.composer-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.composer-card {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.composer-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.composer-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.composer-body {
+  padding: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.row .form-group:first-child:nth-last-child(1),
+.row .form-group:only-child {
+  grid-column: 1 / -1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+select,
+input[type="url"],
+input[type="text"],
+textarea {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.segmented {
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.segmented button {
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.preview {
+  margin-top: 8px;
+}
+
+.preview img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+}
+
+.composer-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  color: #fff;
+}
+

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UserAuthService } from '../../../core/services/user-auth.service';
+// import { UserAuthService } from '../../../core/services/user-auth.service';
 import { ToasterService } from '../../../shared/services/toaster.service';
 
 @Component({
@@ -17,7 +17,7 @@ export class ForgotPasswordComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private userAuthService: UserAuthService,
+    // private userAuthService: UserAuthService,
     private toasterService: ToasterService
   ) { }
 
@@ -36,23 +36,23 @@ export class ForgotPasswordComponent implements OnInit {
     this.isLoading = true;
     const { email } = this.forgotPasswordForm.value;
 
-    this.userAuthService.forgotPassword(email).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.toasterService.show(response.message || 'Password reset link sent to your email.', 'success');
-          this.forgotPasswordForm.reset();
-          this.router.navigate(['/login']);
-        } else {
-          this.toasterService.show('Failed to send reset link. Please try again.', 'error');
-        }
-          this.isLoading = false;
-      },
-      error: (error) => {
-        const errorMessage = error?.error?.message || error?.message || 'Failed to send reset link. Please try again.';
-        this.toasterService.show(errorMessage, 'error');
-        this.isLoading = false;
-      },
+    // this.userAuthService.forgotPassword(email).subscribe({
+    //   next: (response) => {
+    //     if (response.success) {
+    //       this.toasterService.show(response.message || 'Password reset link sent to your email.', 'success');
+    //       this.forgotPasswordForm.reset();
+    //       this.router.navigate(['/login']);
+    //     } else {
+    //       this.toasterService.show('Failed to send reset link. Please try again.', 'error');
+    //     }
+    //       this.isLoading = false;
+    //   },
+    //   error: (error) => {
+    //     const errorMessage = error?.error?.message || error?.message || 'Failed to send reset link. Please try again.';
+    //     this.toasterService.show(errorMessage, 'error');
+    //     this.isLoading = false;
+    //   },
 
-    });
+    // });
   }
 }

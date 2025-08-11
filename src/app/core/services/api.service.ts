@@ -18,7 +18,7 @@ export class ApiService {
     });
 
     if (includeToken) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('jwt_token');
       if (token) {
         headers = headers.set('Authorization', `Bearer ${token}`);
       }
@@ -42,6 +42,12 @@ export class ApiService {
   get<T>(url: string): Observable<T> {
     return this.http
       .get<T>(`${this.baseUrl}${url}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  delete<T>(url: string): Observable<T> {
+    return this.http
+      .delete<T>(`${this.baseUrl}${url}`, { headers: this.getHeaders() })
       .pipe(catchError(this.handleError));
   }
 

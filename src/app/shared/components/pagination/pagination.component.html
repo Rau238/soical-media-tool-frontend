@@ -1,0 +1,14 @@
+<div class="flex gap-2 mt-4" [ngClass]="alignmentClass">
+  <button class="px-3 border rounded-lg h-9 text-sm"
+          [disabled]="!hasPrev || loading"
+          (click)="onPrevClick()">
+    <span *ngIf="!loading">Prev</span>
+    <span *ngIf="loading">Loading…</span>
+  </button>
+  <button class="px-3 border rounded-lg h-9 text-sm"
+          [disabled]="!hasNext || loading"
+          (click)="onNextClick()">
+    <span *ngIf="!loading">Next</span>
+    <span *ngIf="loading">Loading…</span>
+  </button>
+</div>

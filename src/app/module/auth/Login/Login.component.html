@@ -46,25 +46,35 @@
         <div>
           <label for="email" class="block mb-1 font-medium text-gray-700 text-sm">Email</label>
           <input id="email" type="email" formControlName="email" placeholder="name@example.com"
-            class="shadow-sm mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition" />
+            class="shadow-sm mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition"
+            [class.border-red-500]="hasFieldError('email')"
+            [class.border-gray-300]="!hasFieldError('email')" />
+          @if (getFieldError('email')) {
+            <p class="mt-1 text-red-500 text-sm">{{ getFieldError('email') }}</p>
+          }
         </div>
         <div>
           <label for="password" class="block mb-1 font-medium text-gray-700 text-sm">Password</label>
           <input id="password" type="password" formControlName="password" placeholder="••••••••"
-            class="shadow-sm mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition" />
+            class="shadow-sm mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition"
+            [class.border-red-500]="hasFieldError('password')"
+            [class.border-gray-300]="!hasFieldError('password')" />
+          @if (getFieldError('password')) {
+            <p class="mt-1 text-red-500 text-sm">{{ getFieldError('password') }}</p>
+          }
         </div>
         <div class="flex justify-end">
           <a routerLink="/forgot-password" class="text-blue-600 text-sm hover:underline">Forgot password?</a>
         </div>
 
-        <button type="submit" [disabled]="loginForm.invalid || isLoading"
+        <button type="submit" [disabled]="loginForm.invalid || isLoading() || isSubmitting()"
           class="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 shadow-lg p-3 rounded-lg w-full font-semibold text-white transition disabled:cursor-not-allowed">
-          @if (isLoading) {
-          <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"viewBox="0 0 24 24">
+          @if (isLoading() || isSubmitting()) {
+          <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>}
-          {{ isLoading ? 'Sign In...' : 'Sign In' }}
+          {{ (isLoading() || isSubmitting()) ? 'Signing In...' : 'Sign In' }}
         </button>
 
         <div class="flex justify-center items-center my-4 w-full">
@@ -73,11 +83,7 @@
           <div class="flex-grow border-gray-300 border-t"></div>
         </div>
 
-        <div class="flex justify-center items-center">
-            <asl-google-signin-button (click)="loginWithGoogle()" type="standard" size="large" text="signin_with" shape="pill" theme="filled_blue"
-              logo_alignment="left">
-            </asl-google-signin-button>
-          </div>
+
       </form>
     </div>
   </div>

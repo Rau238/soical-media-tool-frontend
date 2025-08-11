@@ -1,0 +1,25 @@
+<div [class]="containerClass">
+  <!-- Media slot (e.g., image) -->
+  <ng-content select="[card-media]"></ng-content>
+
+  <!-- Header + badges -->
+  <div class="flex justify-between items-start p-4 border-slate-100 border-b" *ngIf="false">
+    <!-- Optional header area if used via slot -->
+  </div>
+  <div class="p-4 pb-0">
+    <ng-content select="[card-header]"></ng-content>
+    <div class="mt-2 -mb-2">
+      <ng-content select="[card-badges]"></ng-content>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div [class]="bodyPaddingClass">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex justify-between items-center px-4 py-3 border-slate-100 border-t">
+    <ng-content select="[card-footer]"></ng-content>
+  </div>
+</div>
