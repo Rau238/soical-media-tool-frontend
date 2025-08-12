@@ -39,15 +39,15 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
-  get<T>(url: string): Observable<T> {
+  get<T>(url: string, params?: Record<string, any>, includeToken: boolean = true): Observable<T> {
     return this.http
-      .get<T>(`${this.baseUrl}${url}`, { headers: this.getHeaders() })
+      .get<T>(`${this.baseUrl}${url}`, { headers: this.getHeaders(includeToken), params })
       .pipe(catchError(this.handleError));
   }
 
-  delete<T>(url: string): Observable<T> {
+  delete<T>(url: string, body?: any, includeToken: boolean = true): Observable<T> {
     return this.http
-      .delete<T>(`${this.baseUrl}${url}`, { headers: this.getHeaders() })
+      .delete<T>(`${this.baseUrl}${url}`, { headers: this.getHeaders(includeToken), body })
       .pipe(catchError(this.handleError));
   }
 

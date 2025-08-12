@@ -16,10 +16,10 @@ export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn):
   const retryService = inject(HttpRetryService);
 
   const authenticatedRequest = addAuthenticationHeader(req, tokenService);
-  const retryConfig = retryService.getRetryConfigForRequest(authenticatedRequest);
+  // const retryConfig = retryService.getRetryConfigForRequest(authenticatedRequest);
 
   return next(authenticatedRequest).pipe(
-    retryService.createRetryOperator<HttpEvent<unknown>>(retryConfig),
+    // retryService.createRetryOperator<HttpEvent<unknown>>(retryConfig),
     catchError((error: HttpErrorResponse) =>
       errorHandler.handleError(error, {
         showToast: shouldShowToast(req),

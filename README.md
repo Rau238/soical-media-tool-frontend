@@ -1,60 +1,27 @@
-# SocialSparkFrontend
+# Social Spark Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.0.
+## LinkedIn Setup & Usage
 
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
+1. Create LinkedIn App (see backend README) and get Client ID/Secret.
+2. Configure redirect route in the Angular app (e.g., `/linkedin/callback`).
+3. Authorization URL to initiate login (open in a new window/tab):
 ```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=LINKEDIN_CLIENT_ID&redirect_uri=ENCODED_REDIRECT&scope=r_liteprofile%20r_emailaddress%20w_member_social%20w_organization_social%20rw_organization_admin
 ```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
+4. On redirect, read the `code` from the query string and call backend:
 ```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
+POST /api/social-accounts/linkedin/oauth/exchange { code }
 ```
+This returns `{ access_token, expires_in }`.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+5. Use LinkedInService methods:
+- `exchangeCodeForToken(code)` – exchange code for token
+- `createMemberPost(accessToken, authorUrn, text)`
+- `createOrganizationPost(accessToken, orgUrn, text)`
+- `listMemberPosts(accessToken, authorUrn, start?, count?)`
+- `listOrganizationPosts(accessToken, orgUrn, start?, count?)`
+- `deletePost(accessToken, urn)`
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-"# soical-media-tool-frontend" 
+Notes:
+- Validate inputs before calling (non-empty text, valid URNs).
+- Show user-friendly errors when LinkedIn returns authorization or permission errors. 

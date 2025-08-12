@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of, map } from 'rxjs';
 import { ApiService } from './api.service';
+import { LinkedInNormalizedProfile } from '../models/api-models';
 import {
   ConnectedAccountsResponse,
   FacebookConnectionRequest,
@@ -219,6 +220,35 @@ getConnectedAccounts(): Observable<ConnectedAccountsResponse> {
           message: 'Failed to retrieve Instagram accounts',
           data: null
         } as any);
+      })
+    );
+  }
+
+  // ===== LINKEDIN APIs (account-scoped like Facebook) =====
+
+  getLinkedInProfileByAccount(socialAccountId: string) {
+    return this.apiService.get<{ success: boolean; data: LinkedInNormalizedProfile }>(`/api/social-accounts/${socialAccountId}/linkedin/me`).pipe(
+      catchError((error) => {
+        console.error('❌ Failed to get LinkedIn profile:', error);
+        return of({ success: false, message: 'Failed to retrieve LinkedIn profile' } as any);
+      })
+    );
+  }
+
+  getLinkedInOrganizationsByAccount(socialAccountId: string) {
+    return this.apiService.get<{ success: boolean; data: any }>(`/api/social-accounts/${socialAccountId}/linkedin/organizations`).pipe(
+      catchError((error) => {
+        console.error('❌ Failed to get LinkedIn organizations:', error);
+        return of({ success: false, message: 'Failed to retrieve LinkedIn organizations' } as any);
+      })
+    );
+  }
+
+  createLinkedInMemberPostByAccount(socialAccountId: string, text: string) {
+    return this.apiService.post<{ success: boolean; data: any }>(`/api/social-accounts/${socialAccountId}/linkedin/member/post`, { text }).pipe(
+      catchError((error) => {
+        console.error('❌ Failed to create LinkedIn member post:', error);
+        return of({ success: false, message: 'Failed to create LinkedIn post' } as any);
       })
     );
   }

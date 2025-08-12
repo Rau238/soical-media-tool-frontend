@@ -92,6 +92,14 @@ export interface DisconnectResponse {
   message: string;
 }
 
+// LinkedIn normalized profile
+export interface LinkedInNormalizedProfile {
+  id: string;
+  fullName?: string;
+  headline?: string;
+  photoUrl?: string;
+}
+
 // Extended Facebook Profile interfaces
 export interface FacebookProfile {
   id: string;

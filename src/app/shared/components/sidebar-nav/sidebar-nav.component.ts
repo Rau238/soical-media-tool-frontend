@@ -1,12 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DialogService } from '../../services/dialog.service';
 import { AuthService } from 'src/app/core/services/user-auth.service';
+import { CommonModule } from '@angular/common';
+import { DEFAULT_SIDEBAR_ITEMS, SidebarNavItem } from '../../constants/nav.constants';
 
 @Component({
   selector: 'app-sidebar-nav',
   templateUrl: './sidebar-nav.component.html',
-  styleUrls: ['./sidebar-nav.component.css']
+  styleUrls: ['./sidebar-nav.component.css'],
+  standalone: true,
+  imports: [CommonModule, RouterModule]
 })
 export class SidebarNavComponent implements OnInit {
   private router: Router = inject(Router)
@@ -15,8 +19,22 @@ export class SidebarNavComponent implements OnInit {
 
   constructor() { }
   lastResult: boolean | null = null;
+    mode: 'collapsed' | 'expanded' = 'expanded';
+  items: SidebarNavItem[] = DEFAULT_SIDEBAR_ITEMS;
 
-  ngOnInit() { }
+  ngOnInit() {
+    try {
+      const saved = localStorage.getItem('sidebar_mode');
+      if (saved === 'collapsed' || saved === 'expanded') {
+        this.mode = saved as 'collapsed' | 'expanded';
+      }
+    } catch (_) { /* ignore */ }
+  }
+
+  toggleMode() {
+    this.mode = this.mode === 'expanded' ? 'collapsed' : 'expanded';
+    try { localStorage.setItem('sidebar_mode', this.mode); } catch (_) { /* ignore */ }
+  }
   showConfirmDialog() {
     this.dialogService.open({
       title: 'Confirm Action',
